@@ -1,12 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Brain, Zap, FileText } from 'lucide-react';
 
 function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <nav className="bg-blue-600 px-8 py-4 flex justify-between items-center shadow-md">
-        <div className="text-white text-xl font-bold">🏥 LiverAI</div>
+        <div className="flex items-center gap-2 text-white text-xl font-bold">
+          <img src="/logo.png" alt="LiverAI Logo" className="w-8 h-8 object-contain" />
+          LiverAI
+        </div>
         <div className="flex gap-4">
           <Link className="text-white hover:text-blue-200 transition" to="/">
             Home
@@ -45,17 +49,17 @@ function LandingPage() {
         <h2 className="text-3xl font-bold text-center text-blue-700 mb-12">Why LiverAI?</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           <div className="bg-white p-6 rounded-xl shadow text-center">
-            <div className="text-4xl mb-4">🧠</div>
+            <Brain className="w-12 h-12 mx-auto mb-4 text-blue-600" />
             <h3 className="text-xl font-semibold text-blue-700 mb-2">AI Powered</h3>
             <p className="text-gray-500">Deep learning model trained on real MRI scans for accurate detection.</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow text-center">
-            <div className="text-4xl mb-4">⚡</div>
+            <Zap className="w-12 h-12 mx-auto mb-4 text-blue-600" />
             <h3 className="text-xl font-semibold text-blue-700 mb-2">Fast Results</h3>
             <p className="text-gray-500">Get instant cirrhosis stage detection in seconds.</p>
           </div>
           <div className="bg-white p-6 rounded-xl shadow text-center">
-            <div className="text-4xl mb-4">📄</div>
+            <FileText className="w-12 h-12 mx-auto mb-4 text-blue-600" />
             <h3 className="text-xl font-semibold text-blue-700 mb-2">PDF Reports</h3>
             <p className="text-gray-500">Download detailed medical reports for every scan.</p>
           </div>

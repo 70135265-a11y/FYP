@@ -30,7 +30,9 @@ function RegisterPage() {
     return '';
   };
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const nextError = validate();
     setError(nextError);
@@ -38,12 +40,35 @@ function RegisterPage() {
 
     if (nextError) return;
 
-    // Frontend-only: simulate successful registration.
-    setSuccess('Account created successfully. Redirecting to login...');
+    setIsSubmitting(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: trimmedFullName,
+          email: trimmedEmail,
+          password,
+          role: 'patient',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || 'Registration failed. Please try again.');
+      }
+
+      setSuccess('Account created successfully. Redirecting to login...');
       navigate('/login');
-    }, 900);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -140,9 +165,10 @@ function RegisterPage() {
 
             <button
               type="submit"
+              disabled={isSubmitting}
               className="w-full rounded-2xl bg-blue-600 px-5 py-3 text-white text-lg font-semibold shadow-lg shadow-blue-500/20 transition hover:bg-blue-700"
             >
-              Create account
+              {isSubmitting ? 'Creating account...' : 'Create account'}
             </button>
           </form>
 

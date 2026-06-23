@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { Link } from 'react-router-dom';
+import { Upload, Stethoscope, FileText, BarChart3 } from 'lucide-react';
 
 function DashboardHome() {
   return (
@@ -17,7 +18,7 @@ function DashboardHome() {
               to="/dashboard/upload"
               className="inline-flex items-center gap-2 justify-center rounded-lg bg-blue-600 text-white font-semibold px-6 py-3 hover:bg-blue-700 transition"
             >
-              <span className="text-xl">📤</span>
+              <Upload className="w-5 h-5" />
               Upload MRI Scan
             </Link>
           </div>
@@ -26,8 +27,8 @@ function DashboardHome() {
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-gray-500 text-sm font-medium">Latest scan</div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
-                  🩺
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Stethoscope className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
               <div className="text-4xl font-bold text-blue-700 mt-1">—</div>
@@ -36,8 +37,8 @@ function DashboardHome() {
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-gray-500 text-sm font-medium">Scans in history</div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
-                  📋
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
               <div className="text-4xl font-bold text-blue-700 mt-1">0</div>
@@ -46,8 +47,8 @@ function DashboardHome() {
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-gray-500 text-sm font-medium">Reports available</div>
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
-                  📊
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
               <div className="text-4xl font-bold text-blue-700 mt-1">0</div>
@@ -62,21 +63,21 @@ function DashboardHome() {
                 to="/dashboard/upload"
                 className="rounded-lg border border-blue-200 bg-blue-50 px-5 py-4 font-semibold text-blue-700 hover:bg-blue-100 transition flex items-center gap-3"
               >
-                <span className="text-2xl">📤</span>
+                <Upload className="w-6 h-6" />
                 <span>Upload MRI Scans</span>
               </Link>
               <Link
                 to="/dashboard/history"
                 className="rounded-lg border border-gray-200 bg-white px-5 py-4 font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center gap-3"
               >
-                <span className="text-2xl">📋</span>
+                <FileText className="w-6 h-6" />
                 <span>Scans History</span>
               </Link>
               <Link
                 to="/dashboard/reports"
                 className="rounded-lg border border-gray-200 bg-white px-5 py-4 font-semibold text-gray-700 hover:bg-gray-50 transition flex items-center gap-3"
               >
-                <span className="text-2xl">📊</span>
+                <BarChart3 className="w-6 h-6" />
                 <span>Reports</span>
               </Link>
             </div>
