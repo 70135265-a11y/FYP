@@ -9,5 +9,6 @@ python-multipart
 email-validator
 pydicom
 pillow
-google-generativeai
+google-genai
 python-dotenv
+requests

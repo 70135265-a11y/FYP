@@ -4,7 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from routers.auth import get_current_user
 from models import User
-import google.generativeai as genai
+import google.genai as genai
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -15,8 +19,8 @@ def get_client():
             status_code=500,
             detail="Gemini API key not configured. Please set GEMINI_API_KEY environment variable."
         )
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-1.5-flash")
+    client = genai.Client(api_key=api_key)
+    return client
 
 SYSTEM_PROMPT = """You are a helpful medical AI assistant for a liver cirrhosis detection application. Your role is to:
 
@@ -64,28 +68,30 @@ def chat(
     current_user: User = Depends(get_current_user),
 ):
     try:
-        model = get_client()
-        conversation = SYSTEM_PROMPT + "\n\n"
+        logger.info(f"Chat request from user {current_user.id}")
+        client = get_client()
+        
+        # Build conversation history
+        messages = [{"role": "model", "parts": [{"text": SYSTEM_PROMPT}]}]
         for msg in request.messages:
             if msg.role == "user":
-                conversation += f"User: {msg.content}\n"
+                messages.append({"role": "user", "parts": [{"text": msg.content}]})
             else:
-                conversation += f"Assistant: {msg.content}\n"
-        conversation += "Assistant:"
+                messages.append({"role": "model", "parts": [{"text": msg.content}]})
 
-        response = model.generate_content(
-            conversation,
-            generation_config=genai.types.GenerationConfig(
-                max_output_tokens=500,
-                temperature=0.7,
-            ),
+        logger.info("Calling Gemini API...")
+        response = client.models.generate_content(
+            model="gemini-2.0-flash-exp",
+            contents=messages,
         )
 
         assistant_message = response.text
+        logger.info("Gemini API response received")
 
         return ChatResponse(message=assistant_message)
 
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Chat error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Chat error: {str(e)}")

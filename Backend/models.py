@@ -27,6 +27,7 @@ class Scan(Base):
     patient_name = Column(String(100), nullable=False)
     patient_phone = Column(String(20), nullable=False)
     patient_id_no = Column(String(50), nullable=False)
+    patient_cnic = Column(String(20), nullable=True)
     image_path = Column(String(255), nullable=False)
     result = Column(String(100), nullable=False)
     stage = Column(String(100), nullable=False)

@@ -7,6 +7,7 @@ function RegisterPage() {
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   // Role kept for future backend usage; currently unused.
   // const [role, setRole] = useState('patient');
 
@@ -23,6 +24,8 @@ function RegisterPage() {
   const validate = () => {
     if (!trimmedFullName) return 'Please enter your full name.';
     if (!trimmedEmail) return 'Please enter your email address.';
+    if (!phone) return 'Please enter your phone number.';
+    if (phone.length < 10) return 'Phone number must be at least 10 digits.';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) return 'Please enter a valid email address.';
     if (password.length < 6) return 'Password must be at least 6 characters.';
     if (password !== confirmPassword) return 'Passwords do not match.';
@@ -51,6 +54,7 @@ function RegisterPage() {
         body: JSON.stringify({
           name: trimmedFullName,
           email: trimmedEmail,
+          phone,
           password,
           role: 'patient',
         }),
@@ -110,7 +114,18 @@ function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 type="email"
-                placeholder="you@example.com"
+                placeholder="you@gmail.com"
+                className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-slate-700">Phone number</span>
+              <input
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                type="tel"
+                placeholder="e.g., 03001234567"
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               />
             </label>

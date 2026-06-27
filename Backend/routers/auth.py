@@ -7,6 +7,10 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from database import get_db
 from models import User
 from schemas import Token, UserCreate, UserLogin, UserResponse, UserUpdate
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from email_utils import send_welcome_email
 
 router = APIRouter()
 security = HTTPBearer()
@@ -65,19 +69,26 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
         name=user_data.name,
         email=user_data.email,
         password=hash_password(user_data.password),
+        phone=user_data.phone,
         role=user_data.role,
     )
     db.add(user)
     db.commit()
     db.refresh(user)
+    
+    # Send welcome email
+    send_welcome_email(user.email, user.name)
+    
     return user
 
 
 @router.post("/login", response_model=Token)
 def login(login_data: UserLogin, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == login_data.email).first()
-    if not user or not verify_password(login_data.password, user.password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+    if not user:
+        raise HTTPException(status_code=401, detail="No account exists on this email")
+    if not verify_password(login_data.password, user.password):
+        raise HTTPException(status_code=401, detail="Invalid password")
 
     access_token = create_access_token(data={"sub": str(user.id)})
     return {"access_token": access_token, "token_type": "bearer", "user": user}
@@ -110,3 +121,25 @@ def update_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.delete("/me")
+def delete_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Delete all scans associated with the user (this will cascade to reports)
+    from models import Scan, Report
+    
+    scans = db.query(Scan).filter(Scan.user_id == current_user.id).all()
+    for scan in scans:
+        # Delete image file if exists
+        if scan.image_path and os.path.exists(scan.image_path):
+            os.remove(scan.image_path)
+        db.delete(scan)
+    
+    # Delete the user
+    db.delete(current_user)
+    db.commit()
+    
+    return {"message": "Profile deleted successfully"}

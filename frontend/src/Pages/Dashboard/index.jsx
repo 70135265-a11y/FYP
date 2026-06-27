@@ -1,9 +1,67 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { Link } from 'react-router-dom';
 import { Upload, Stethoscope, FileText, BarChart3 } from 'lucide-react';
 
 function DashboardHome() {
+  const [latestScan, setLatestScan] = useState(null);
+  const [scanCount, setScanCount] = useState(0);
+  const [reportCount, setReportCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      // Check both localStorage and sessionStorage for token
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+      
+      // Fetch scan history
+      const scansResponse = await fetch('http://127.0.0.1:8000/api/scans/history', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (scansResponse.ok) {
+        const scans = await scansResponse.json();
+        setScanCount(scans.length);
+        if (scans.length > 0) {
+          setLatestScan(scans[0]);
+        }
+      }
+
+      // Fetch reports
+      const reportsResponse = await fetch('http://127.0.0.1:8000/api/reports/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (reportsResponse.ok) {
+        const reports = await reportsResponse.json();
+        setReportCount(reports.length);
+      }
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   return (
     <div className="min-h-screen flex">
       <Sidebar />
@@ -31,8 +89,20 @@ function DashboardHome() {
                   <Stethoscope className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
-              <div className="text-4xl font-bold text-blue-700 mt-1">—</div>
-              <div className="text-gray-500 text-sm mt-3">Upload to get started.</div>
+              {loading ? (
+                <div className="text-4xl font-bold text-blue-700 mt-1">...</div>
+              ) : latestScan ? (
+                <>
+                  <div className="text-4xl font-bold text-blue-700 mt-1">{latestScan.result}</div>
+                  <div className="text-gray-500 text-sm mt-3">{formatDate(latestScan.created_at)}</div>
+                  <div className="text-gray-400 text-xs mt-1">Patient: {latestScan.patient_name}</div>
+                </>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-blue-700 mt-1">—</div>
+                  <div className="text-gray-500 text-sm mt-3">Upload to get started.</div>
+                </>
+              )}
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
               <div className="flex items-center justify-between mb-4">
@@ -41,8 +111,14 @@ function DashboardHome() {
                   <FileText className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
-              <div className="text-4xl font-bold text-blue-700 mt-1">0</div>
-              <div className="text-gray-500 text-sm mt-3">No scans yet.</div>
+              {loading ? (
+                <div className="text-4xl font-bold text-blue-700 mt-1">...</div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-blue-700 mt-1">{scanCount}</div>
+                  <div className="text-gray-500 text-sm mt-3">{scanCount === 0 ? 'No scans yet.' : 'Total scans uploaded'}</div>
+                </>
+              )}
             </div>
             <div className="rounded-lg border border-gray-200 bg-white p-6 shadow">
               <div className="flex items-center justify-between mb-4">
@@ -51,8 +127,14 @@ function DashboardHome() {
                   <BarChart3 className="w-5 h-5 text-blue-600" />
                 </div>
               </div>
-              <div className="text-4xl font-bold text-blue-700 mt-1">0</div>
-              <div className="text-gray-500 text-sm mt-3">Generate reports after upload.</div>
+              {loading ? (
+                <div className="text-4xl font-bold text-blue-700 mt-1">...</div>
+              ) : (
+                <>
+                  <div className="text-4xl font-bold text-blue-700 mt-1">{reportCount}</div>
+                  <div className="text-gray-500 text-sm mt-3">{reportCount === 0 ? 'Generate reports after upload.' : 'Reports generated'}</div>
+                </>
+              )}
             </div>
           </div>
 

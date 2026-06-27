@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
-import { User, Mail, Phone, MapPin, Edit2, Save, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Edit2, Save, X, Trash2 } from 'lucide-react';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -85,7 +86,41 @@ function ProfilePage() {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+const handleDelete = async () => {
+    if (!window.confirm('Are you sure you want to delete your profile? This action cannot be undone and will delete all your scans and reports.')) {
+      return;
+    }
 
+    setDeleting(true);
+    try {
+      const token = getToken();
+      const response = await fetch('http://127.0.0.1:8000/api/auth/me', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.detail || 'Failed to delete profile.');
+      }
+
+      // Clear local storage and redirect to login
+      const authStorage = localStorage.getItem('authStorage');
+      if (authStorage === 'session') {
+        sessionStorage.removeItem('token');
+      } else {
+        localStorage.removeItem('token');
+      }
+      localStorage.removeItem('authStorage');
+      window.location.href = '/login';
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  
   if (loading) {
     return (
       <div className="min-h-screen flex">
@@ -254,6 +289,21 @@ function ProfilePage() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-200">
+                <h4 className="text-lg font-semibold text-gray-800 mb-4">Danger Zone</h4>
+                <p className="text-gray-500 text-sm mb-4">
+                  Once you delete your account, there is no going back. All your scans and reports will be permanently deleted.
+                </p>
+                <button
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  {deleting ? 'Deleting...' : 'Delete Account'}
+                </button>
               </div>
             </div>
           </div>

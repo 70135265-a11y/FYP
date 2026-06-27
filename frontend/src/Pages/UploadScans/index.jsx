@@ -6,13 +6,13 @@ function UploadScansPage() {
   const [patientName, setPatientName] = useState('');
   const [patientPhone, setPatientPhone] = useState('');
   const [patientIdNo, setPatientIdNo] = useState('');
+  const [patientCnic, setPatientCnic] = useState('');
   const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadPct, setUploadPct] = useState(0);
   const [analysing, setAnalysing] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
-  const inputRef = useRef(null);
   const folderRef = useRef(null);
 
   const getToken = () => {
@@ -55,6 +55,9 @@ function UploadScansPage() {
     formData.append('patient_name', patientName.trim());
     formData.append('patient_phone', patientPhone.trim());
     formData.append('patient_id_no', patientIdNo.trim());
+    if (patientCnic.trim()) {
+      formData.append('patient_cnic', patientCnic.trim());
+    }
     files.forEach((f) => formData.append('files', f));
 
     const xhr = new XMLHttpRequest();
@@ -90,6 +93,7 @@ function UploadScansPage() {
 
   const handleReset = () => {
     setPatientName('');
+    setPatientCnic('');
     setPatientPhone('');
     setPatientIdNo('');
     setFiles([]);
@@ -97,7 +101,6 @@ function UploadScansPage() {
     setError('');
     setUploadPct(0);
     setAnalysing(false);
-    if (inputRef.current) inputRef.current.value = '';
     if (folderRef.current) folderRef.current.value = '';
   };
 
@@ -133,6 +136,12 @@ function UploadScansPage() {
                     placeholder="e.g. PAT-001 or CNIC"
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
                 </div>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Patient CNIC <span className="text-red-500">*</span></label>
+                  <input type="text" value={patientCnic} onChange={(e) => setPatientCnic(e.target.value)}
+                    placeholder="e.g. 12345-1234567-1"
+                    className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
+                </div>
               </div>
 
               <div
@@ -143,17 +152,12 @@ function UploadScansPage() {
                 <div className="text-5xl mb-3">🩻</div>
                 <p className="text-blue-600 font-semibold">Select all slices for one patient's liver scan</p>
                 <div className="mt-4 flex justify-center gap-3">
-                  <button type="button" onClick={() => inputRef.current?.click()}
-                    className="rounded-lg bg-blue-600 text-white text-xs font-semibold px-4 py-2 hover:bg-blue-700 transition">
-                    📂 Select Files
-                  </button>
                   <button type="button" onClick={() => folderRef.current?.click()}
                     className="rounded-lg bg-indigo-600 text-white text-xs font-semibold px-4 py-2 hover:bg-indigo-700 transition">
                     🗂️ Select Folder
                   </button>
                 </div>
-                <p className="text-gray-400 text-sm mt-3">Supports DICOM (.dcm), JPG, PNG — all slices treated as one scan</p>
-                <input ref={inputRef} type="file" accept="image/*,.dcm" multiple className="hidden" onChange={handleFileChange} />
+                <p className="text-gray-400 text-sm mt-3">Select a folder containing DICOM (.dcm), JPG, or PNG slices — all files treated as one scan</p>
                 <input ref={folderRef} type="file" multiple webkitdirectory="" className="hidden" onChange={handleFileChange} />
               </div>
 
@@ -164,7 +168,7 @@ function UploadScansPage() {
                     <div className="font-semibold text-indigo-800">{files.length} slice{files.length !== 1 ? 's' : ''} ready</div>
                     <div className="text-xs text-indigo-500 mt-0.5 truncate">{files[0].name}{files.length > 1 ? ` … ${files[files.length - 1].name}` : ''}</div>
                   </div>
-                  <button onClick={() => { setFiles([]); if (inputRef.current) inputRef.current.value = ''; if (folderRef.current) folderRef.current.value = ''; }}
+                  <button onClick={() => { setFiles([]); if (folderRef.current) folderRef.current.value = ''; }}
                     className="text-xs text-red-400 hover:text-red-600 font-medium">Clear</button>
                 </div>
               )}

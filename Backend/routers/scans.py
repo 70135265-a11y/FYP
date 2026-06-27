@@ -19,6 +19,7 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 def upload_scan(
     patient_name: str = Form(...),
     patient_phone: str = Form(...),
+    patient_cnic: str = Form(...),
     patient_id_no: str = Form(...),
     file: UploadFile = File(...),
     db: Session = Depends(get_db),
@@ -49,6 +50,7 @@ def upload_scan(
         user_id=current_user.id,
         patient_name=patient_name,
         patient_phone=patient_phone,
+        patient_cnic=patient_cnic,
         patient_id_no=patient_id_no,
         image_path=file_path,
         result=result,
@@ -80,6 +82,7 @@ def upload_scan(
 @router.post("/upload-folder", response_model=ScanResponse)
 def upload_folder(
     patient_name: str = Form(...),
+    patient_cnic: str = Form(...),
     patient_phone: str = Form(...),
     patient_id_no: str = Form(...),
     files: List[UploadFile] = File(...),
@@ -127,6 +130,7 @@ def upload_folder(
 
     scan = Scan(
         user_id=current_user.id,
+        patient_cnic=patient_cnic,
         patient_name=patient_name,
         patient_phone=patient_phone,
         patient_id_no=patient_id_no,
@@ -166,8 +170,8 @@ def get_scan_history(
     return db.query(Scan).filter(Scan.user_id == current_user.id).order_by(Scan.created_at.desc()).all()
 
 
-@router.get("/{scan_id}", response_model=ScanResponse)
-def get_scan_detail(
+@router.delete("/{scan_id}")
+def delete_scan(
     scan_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -175,4 +179,12 @@ def get_scan_detail(
     scan = db.query(Scan).filter(Scan.id == scan_id, Scan.user_id == current_user.id).first()
     if not scan:
         raise HTTPException(status_code=404, detail="Scan not found")
+    
+    # Delete the image file
+    if scan.image_path and os.path.exists(scan.image_path):
+        os.remove(scan.image_path)
+    
+    db.delete(scan)
+    db.commit()
+    return {"message": "Scan deleted successfully"}
     return scan

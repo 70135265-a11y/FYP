@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../Components/Dashboard/Sidebar';
-import { Upload, ScanLine } from 'lucide-react';
+import { Upload, ScanLine, Search, Trash2 } from 'lucide-react';
 
 function ScansHistoryPage() {
   const [scans, setScans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterResult, setFilterResult] = useState('all');
+  const [deleting, setDeleting] = useState(null);
 
   const getToken = () => {
     const authStorage = localStorage.getItem('authStorage');
@@ -36,6 +39,43 @@ function ScansHistoryPage() {
     fetchHistory();
   }, []);
 
+  const handleDelete = async (scanId) => {
+    if (!window.confirm('Are you sure you want to delete this scan?')) return;
+    
+    setDeleting(scanId);
+    try {
+      const token = getToken();
+      const response = await fetch(`http://127.0.0.1:8000/api/scans/${scanId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error('Failed to delete scan.');
+      
+      setScans(scans.filter(scan => scan.id !== scanId));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  const filteredScans = scans.filter(scan => {
+    const matchesSearch = 
+      scan.patient_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      scan.patient_id_no.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      scan.patient_phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (scan.patient_cnic && scan.patient_cnic.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    const matchesFilter = 
+      filterResult === 'all' ||
+      (filterResult === 'normal' && scan.result === 'Normal') ||
+      (filterResult === 'cirrhosis' && scan.result !== 'Normal') ||
+      (filterResult === 'pending' && scan.result === 'Pending');
+    
+    return matchesSearch && matchesFilter;
+  });
+
   const getResultBadge = (result) => {
     const lower = result.toLowerCase();
     if (lower === 'pending') return 'bg-yellow-100 text-yellow-700';
@@ -58,6 +98,29 @@ function ScansHistoryPage() {
           >
             <Upload className="w-5 h-5" /> Upload New
           </Link>
+        </div>
+
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1 relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Search by name, ID, phone, or CNIC..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+            />
+          </div>
+          <select
+            value={filterResult}
+            onChange={(e) => setFilterResult(e.target.value)}
+            className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition"
+          >
+            <option value="all">All Results</option>
+            <option value="normal">Normal</option>
+            <option value="cirrhosis">Cirrhosis</option>
+            <option value="pending">Pending</option>
+          </select>
         </div>
 
         {loading && (
@@ -86,7 +149,21 @@ function ScansHistoryPage() {
           </div>
         )}
 
-        {!loading && scans.length > 0 && (
+        {!loading && scans.length > 0 && filteredScans.length === 0 && (
+          <div className="rounded-xl border border-gray-200 bg-white p-16 text-center shadow">
+            <ScanLine className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+            <h3 className="text-xl font-bold text-gray-700 mb-2">No matching scans</h3>
+            <p className="text-gray-400 mb-6">Try adjusting your search or filter.</p>
+            <button
+              onClick={() => { setSearchQuery(''); setFilterResult('all'); }}
+              className="inline-flex items-center gap-2 rounded-xl bg-blue-600 text-white font-semibold px-6 py-3 hover:bg-blue-700 transition"
+            >
+              Clear Filters
+            </button>
+          </div>
+        )}
+
+        {!loading && scans.length > 0 && filteredScans.length > 0 && (
           <div className="rounded-xl border border-gray-200 bg-white shadow overflow-hidden">
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b border-gray-200">
@@ -94,19 +171,22 @@ function ScansHistoryPage() {
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">#</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Patient Name</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Patient ID</th>
+                  <th className="text-left px-6 py-4 font-semibold text-gray-600">CNIC</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Phone</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Result</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Stage</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Confidence</th>
                   <th className="text-left px-6 py-4 font-semibold text-gray-600">Date</th>
+                  <th className="text-left px-6 py-4 font-semibold text-gray-600">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {scans.map((scan, index) => (
+                {filteredScans.map((scan, index) => (
                   <tr key={scan.id} className="hover:bg-gray-50 transition">
                     <td className="px-6 py-4 text-gray-500">{index + 1}</td>
                     <td className="px-6 py-4 font-medium text-gray-800">{scan.patient_name}</td>
                     <td className="px-6 py-4 text-gray-600">{scan.patient_id_no}</td>
+                    <td className="px-6 py-4 text-gray-600">{scan.patient_cnic || '-'}</td>
                     <td className="px-6 py-4 text-gray-600">{scan.patient_phone}</td>
                     <td className="px-6 py-4">
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${getResultBadge(scan.result)}`}>
@@ -132,12 +212,23 @@ function ScansHistoryPage() {
                         day: 'numeric',
                       })}
                     </td>
+                    <td className="px-6 py-4">
+                      <button
+                        onClick={() => handleDelete(scan.id)}
+                        disabled={deleting === scan.id}
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition disabled:opacity-50"
+                        title="Delete scan"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-400">
-              Total: {scans.length} scan{scans.length !== 1 ? 's' : ''}
+            <div className="px-6 py-3 bg-gray-50 border-t border-gray-100 text-xs text-gray-400 flex justify-between">
+              <span>Total: {scans.length} scan{scans.length !== 1 ? 's' : ''}</span>
+              <span>Showing: {filteredScans.length} scan{filteredScans.length !== 1 ? 's' : ''}</span>
             </div>
           </div>
         )}

@@ -30,7 +30,7 @@ function Sidebar() {
           <img src="/logo.png" alt="LiverAI Logo" className="w-10 h-10 object-contain" />
           <div>
             <div className="text-blue-700 font-bold text-xl">LiverAI</div>
-            <div className="text-gray-500 text-xs mt-0.5">Patient Portal</div>
+            <div className="text-gray-500 text-xs mt-0.5">Doctor Portal</div>
           </div>
         </div>
       </div>

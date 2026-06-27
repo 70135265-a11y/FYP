@@ -6,6 +6,7 @@ class UserCreate(BaseModel):
     name: str
     email: EmailStr
     password: str
+    phone: str
     role: str = "patient"
 
 
@@ -46,6 +47,7 @@ class ScanResponse(BaseModel):
     patient_name: str
     patient_phone: str
     patient_id_no: str
+    patient_cnic: str | None
     image_path: str
     result: str
     stage: str
