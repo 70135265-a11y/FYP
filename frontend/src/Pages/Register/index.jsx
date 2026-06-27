@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageBackground from '../../Components/AuthPageBackground';
+import API_BASE_URL from '../../config';
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -24,9 +25,10 @@ function RegisterPage() {
   const validate = () => {
     if (!trimmedFullName) return 'Please enter your full name.';
     if (!trimmedEmail) return 'Please enter your email address.';
+    if (!trimmedEmail.endsWith('@gmail.com')) return 'Email must end with @gmail.com.';
     if (!phone) return 'Please enter your phone number.';
+    if (!/^\d+$/.test(phone)) return 'Phone number must contain only numbers.';
     if (phone.length < 10) return 'Phone number must be at least 10 digits.';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) return 'Please enter a valid email address.';
     if (password.length < 6) return 'Password must be at least 6 characters.';
     if (password !== confirmPassword) return 'Passwords do not match.';
     if (!acceptedTerms) return 'Please accept the terms to continue.';
@@ -46,7 +48,7 @@ function RegisterPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -123,7 +125,10 @@ function RegisterPage() {
               <span className="text-sm font-medium text-slate-700">Phone number</span>
               <input
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '');
+                  setPhone(value);
+                }}
                 type="tel"
                 placeholder="e.g., 03001234567"
                 className="mt-2 w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
@@ -174,7 +179,14 @@ function RegisterPage() {
               />
               <span>
                 I agree to the{' '}
-                <span className="font-semibold text-slate-700">Terms & Privacy</span>.
+                <Link to="/terms" className="font-semibold text-blue-600 hover:text-blue-800 underline">
+                  Terms
+                </Link>
+                {' '}&{' '}
+                <Link to="/privacy" className="font-semibold text-blue-600 hover:text-blue-800 underline">
+                  Privacy
+                </Link>
+                .
               </span>
             </label>
 

@@ -8,6 +8,10 @@ import ReportsPage from './Pages/Reports';
 import ScansHistoryPage from './Pages/ScansHistory';
 import UploadScansPage from './Pages/UploadScans';
 import ProfilePage from './Pages/Profile';
+import TermsPage from './Pages/Terms';
+import PrivacyPage from './Pages/Privacy';
+import TermsPublicPage from './Pages/TermsPublic';
+import PrivacyPublicPage from './Pages/PrivacyPublic';
 import ChatWidget from './Components/ChatWidget/ChatWidget';
 
 function ProtectedRoute({ children }) {
@@ -31,12 +35,16 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/terms" element={<TermsPublicPage />} />
+        <Route path="/privacy" element={<PrivacyPublicPage />} />
 
         <Route path="/dashboard" element={<ProtectedRoute><DashboardHome /></ProtectedRoute>} />
         <Route path="/dashboard/upload" element={<ProtectedRoute><UploadScansPage /></ProtectedRoute>} />
         <Route path="/dashboard/history" element={<ProtectedRoute><ScansHistoryPage /></ProtectedRoute>} />
         <Route path="/dashboard/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
         <Route path="/dashboard/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/dashboard/terms" element={<ProtectedRoute><TermsPage /></ProtectedRoute>} />
+        <Route path="/dashboard/privacy" element={<ProtectedRoute><PrivacyPage /></ProtectedRoute>} />
       </Routes>
       {token && <ChatWidget />}
     </Router>

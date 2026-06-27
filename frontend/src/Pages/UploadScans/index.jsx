@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../Components/Dashboard/Sidebar';
+import API_BASE_URL from '../../config';
 
 function UploadScansPage() {
   const [patientName, setPatientName] = useState('');
@@ -41,7 +42,9 @@ function UploadScansPage() {
   const handleUpload = () => {
     if (!patientName.trim()) { setError('Patient name is required.'); return; }
     if (!patientPhone.trim()) { setError('Patient phone is required.'); return; }
+    if (!/^\d+$/.test(patientPhone.trim())) { setError('Patient phone must contain only numbers.'); return; }
     if (!patientIdNo.trim()) { setError('Patient ID is required.'); return; }
+    if (patientCnic.trim() && !/^\d+$/.test(patientCnic.trim())) { setError('Patient CNIC must contain only numbers.'); return; }
     if (!files.length) { setError('Please select at least one scan.'); return; }
 
     setUploading(true);
@@ -61,7 +64,7 @@ function UploadScansPage() {
     files.forEach((f) => formData.append('files', f));
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://127.0.0.1:8000/api/scans/upload-folder');
+    xhr.open('POST', `${API_BASE_URL}/api/scans/upload-folder`);
     xhr.setRequestHeader('Authorization', `Bearer ${token}`);
 
     xhr.upload.onprogress = (e) => {
@@ -126,7 +129,10 @@ function UploadScansPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Patient Phone <span className="text-red-500">*</span></label>
-                  <input type="tel" value={patientPhone} onChange={(e) => setPatientPhone(e.target.value)}
+                  <input type="tel" value={patientPhone} onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    setPatientPhone(value);
+                  }}
                     placeholder="e.g. 0300-1234567"
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
                 </div>
@@ -138,7 +144,10 @@ function UploadScansPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Patient CNIC <span className="text-red-500">*</span></label>
-                  <input type="text" value={patientCnic} onChange={(e) => setPatientCnic(e.target.value)}
+                  <input type="text" value={patientCnic} onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    setPatientCnic(value);
+                  }}
                     placeholder="e.g. 12345-1234567-1"
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
                 </div>

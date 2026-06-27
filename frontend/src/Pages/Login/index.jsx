@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AuthPageBackground from '../../Components/AuthPageBackground';
+import API_BASE_URL from '../../config';
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: email.trim(), password }),

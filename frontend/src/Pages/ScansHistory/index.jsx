@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { Upload, ScanLine, Search, Trash2 } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 function ScansHistoryPage() {
   const [scans, setScans] = useState([]);
@@ -22,7 +23,7 @@ function ScansHistoryPage() {
     const fetchHistory = async () => {
       try {
         const token = getToken();
-        const response = await fetch('http://127.0.0.1:8000/api/scans/history', {
+        const response = await fetch(`${API_BASE_URL}/api/scans/history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -45,7 +46,7 @@ function ScansHistoryPage() {
     setDeleting(scanId);
     try {
       const token = getToken();
-      const response = await fetch(`http://127.0.0.1:8000/api/scans/${scanId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/scans/${scanId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

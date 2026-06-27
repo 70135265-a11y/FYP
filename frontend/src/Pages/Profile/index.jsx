@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { User, Mail, Phone, MapPin, Edit2, Save, X, Trash2 } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -28,7 +29,7 @@ function ProfilePage() {
   const fetchProfile = async () => {
     try {
       const token = getToken();
-      const response = await fetch('http://127.0.0.1:8000/api/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -65,7 +66,7 @@ function ProfilePage() {
   const handleSave = async () => {
     try {
       const token = getToken();
-      const response = await fetch('http://127.0.0.1:8000/api/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -94,7 +95,7 @@ const handleDelete = async () => {
     setDeleting(true);
     try {
       const token = getToken();
-      const response = await fetch('http://127.0.0.1:8000/api/auth/me', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

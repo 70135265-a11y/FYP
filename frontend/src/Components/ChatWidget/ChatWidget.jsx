@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Bot, X, Send, MessageSquare } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,7 +36,7 @@ function ChatWidget() {
 
     try {
       const token = getToken();
-      const response = await fetch('http://127.0.0.1:8000/api/chat/chat', {
+      const response = await fetch(`${API_BASE_URL}/api/chat/chat`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

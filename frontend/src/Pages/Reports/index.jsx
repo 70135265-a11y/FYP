@@ -4,6 +4,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { Upload, FileText, Download, Search, Trash2 } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 function ReportsPage() {
   const [reports, setReports] = useState([]);
@@ -24,7 +25,7 @@ function ReportsPage() {
     const fetchReports = async () => {
       try {
         const token = getToken();
-        const response = await fetch('http://127.0.0.1:8000/api/reports/', {
+        const response = await fetch(`${API_BASE_URL}/api/reports/`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -45,7 +46,7 @@ function ReportsPage() {
     setDeleting(reportId);
     try {
       const token = getToken();
-      const response = await fetch(`http://127.0.0.1:8000/api/reports/${reportId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/reports/${reportId}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });

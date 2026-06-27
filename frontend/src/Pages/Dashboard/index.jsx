@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { Link } from 'react-router-dom';
 import { Upload, Stethoscope, FileText, BarChart3 } from 'lucide-react';
+import API_BASE_URL from '../../config';
 
 function DashboardHome() {
   const [latestScan, setLatestScan] = useState(null);
@@ -24,7 +25,7 @@ function DashboardHome() {
       }
       
       // Fetch scan history
-      const scansResponse = await fetch('http://127.0.0.1:8000/api/scans/history', {
+      const scansResponse = await fetch(`${API_BASE_URL}/api/scans/history`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -39,7 +40,7 @@ function DashboardHome() {
       }
 
       // Fetch reports
-      const reportsResponse = await fetch('http://127.0.0.1:8000/api/reports/', {
+      const reportsResponse = await fetch(`${API_BASE_URL}/api/reports/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
