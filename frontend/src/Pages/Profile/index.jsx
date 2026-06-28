@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Sidebar from '../../Components/Dashboard/Sidebar';
 import { User, Mail, Phone, MapPin, Edit2, Save, X, Trash2 } from 'lucide-react';
 import API_BASE_URL from '../../config';
@@ -15,18 +15,14 @@ function ProfilePage() {
     address: '',
   });
 
-  const getToken = () => {
+  const getToken = useCallback(() => {
     const authStorage = localStorage.getItem('authStorage');
     return authStorage === 'session'
       ? sessionStorage.getItem('token')
       : localStorage.getItem('token');
-  };
+  }, []);
 
-  useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
-
-  const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
     try {
       const token = getToken();
       const response = await fetch(`${API_BASE_URL}/api/auth/me`, {
@@ -47,7 +43,11 @@ function ProfilePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [getToken]);
+
+  useEffect(() => {
+    fetchProfile();
+  }, [fetchProfile]);
 
   const handleEdit = () => {
     setEditing(true);
