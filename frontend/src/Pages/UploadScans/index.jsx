@@ -37,7 +37,6 @@ function UploadScansPage() {
 
   const handleFileChange = (e) => { if (e.target.files) addFiles(e.target.files); };
   const handleDrop = (e) => { e.preventDefault(); if (e.dataTransfer.files) addFiles(e.dataTransfer.files); };
-  const removeFile = (idx) => setFiles((prev) => prev.filter((_, i) => i !== idx));
 
   const handleUpload = () => {
     if (!patientName.trim()) { setError('Patient name is required.'); return; }
