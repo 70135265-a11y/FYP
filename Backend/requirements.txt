@@ -12,3 +12,5 @@ pillow
 google-genai
 python-dotenv
 requests
+torch
+numpy
