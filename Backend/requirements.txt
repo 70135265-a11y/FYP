@@ -14,3 +14,4 @@ python-dotenv
 requests
 torch
 numpy
+psycopg2-binary
