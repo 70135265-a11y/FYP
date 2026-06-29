@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 import io
 import os
+import gc
 import pydicom
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "unet_liver.pth")
@@ -63,13 +64,13 @@ def _load_image(image_bytes: bytes) -> Image.Image:
             pixels = pixels[0]
         lo, hi = pixels.min(), pixels.max()
         pixels = ((pixels - lo) / (hi - lo + 1e-8) * 255).astype(np.uint8)
-        return Image.fromarray(pixels).convert("L").resize((256, 256))
+        return Image.fromarray(pixels).convert("L").resize((128, 128))
     except Exception:
         pass
     try:
-        return Image.open(io.BytesIO(image_bytes)).convert("L").resize((256, 256))
+        return Image.open(io.BytesIO(image_bytes)).convert("L").resize((128, 128))
     except Exception:
-        return Image.new("L", (256, 256), 128)
+        return Image.new("L", (128, 128), 128)
 
 
 def predict_score(image_bytes: bytes) -> float:
@@ -77,10 +78,15 @@ def predict_score(image_bytes: bytes) -> float:
     img_array = np.array(img, dtype=np.float32) / 255.0
     tensor = torch.tensor(img_array).unsqueeze(0).unsqueeze(0).to(device)
     model = get_model()
-    with torch.no_grad():
-        output = model(tensor)
-    mask = output.squeeze().cpu().numpy()
-    return float(mask.mean()) * 100
+    try:
+        with torch.no_grad():
+            output = model(tensor)
+        mask = output.squeeze().cpu().numpy()
+        score = float(mask.mean()) * 100
+    finally:
+        del tensor, output
+        gc.collect()
+    return score
 
 
 def score_to_prediction(raw_score: float) -> dict:

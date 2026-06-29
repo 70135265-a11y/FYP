@@ -96,6 +96,13 @@ def upload_folder(
     representative_path = None
     mid_index = len(files) // 2
 
+    MAX_INFERENCE_SLICES = 10
+    if len(files) > MAX_INFERENCE_SLICES:
+        step = len(files) / MAX_INFERENCE_SLICES
+        inference_indices = {round(i * step) for i in range(MAX_INFERENCE_SLICES)}
+    else:
+        inference_indices = set(range(len(files)))
+
     for i, file in enumerate(files):
         file_ext = os.path.splitext(file.filename or "")[1].lower()
         is_image = file.content_type and file.content_type.startswith("image/")
@@ -112,11 +119,14 @@ def upload_folder(
                 f.write(image_bytes)
             representative_path = file_path
 
-        try:
-            score = predict_score(image_bytes)
-            scores.append(score)
-        except Exception:
-            pass
+        if i in inference_indices:
+            try:
+                print(f"[INFERENCE] Running prediction on slice {i}...", flush=True)
+                score = predict_score(image_bytes)
+                scores.append(score)
+                print(f"[INFERENCE] Slice {i} score: {score:.4f}", flush=True)
+            except Exception as e:
+                print(f"[INFERENCE ERROR] Slice {i} failed: {e}", flush=True)
 
     if not representative_path:
         raise HTTPException(status_code=400, detail="No valid image or DICOM files found")

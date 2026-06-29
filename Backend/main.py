@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
 import models
 from routers import auth, scans, patients, reports, chat
-from ai_modal.predict import get_model
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -12,13 +11,6 @@ app = FastAPI(title="LiverAI API")
 
 Base.metadata.create_all(bind=engine)
 
-
-@app.on_event("startup")
-def preload_model():
-    try:
-        get_model()
-    except Exception:
-        pass
 
 app.add_middleware(
     CORSMiddleware,
