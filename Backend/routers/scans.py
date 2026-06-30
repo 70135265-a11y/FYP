@@ -1,3 +1,4 @@
+import gc
 import os
 import shutil
 from typing import List
@@ -43,6 +44,8 @@ def upload_scan(
             image_bytes = f.read()
         pred = predict_image(image_bytes)
         result, stage, confidence = pred["result"], pred["stage"], pred["confidence"]
+        del image_bytes
+        gc.collect()
     except Exception:
         result, stage, confidence = "Pending", "Pending", 0.0
 
@@ -127,6 +130,10 @@ def upload_folder(
                 print(f"[INFERENCE] Slice {i} score: {score:.4f}", flush=True)
             except Exception as e:
                 print(f"[INFERENCE ERROR] Slice {i} failed: {e}", flush=True)
+
+        del image_bytes
+
+    gc.collect()
 
     if not representative_path:
         raise HTTPException(status_code=400, detail="No valid image or DICOM files found")

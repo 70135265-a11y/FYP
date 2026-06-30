@@ -78,13 +78,17 @@ def predict_score(image_bytes: bytes) -> float:
     img_array = np.array(img, dtype=np.float32) / 255.0
     tensor = torch.tensor(img_array).unsqueeze(0).unsqueeze(0).to(device)
     model = get_model()
+    output = None
     try:
-        with torch.no_grad():
+        with torch.inference_mode():
             output = model(tensor)
         mask = output.squeeze().cpu().numpy()
         score = float(mask.mean()) * 100
+        del mask
     finally:
-        del tensor, output
+        del tensor
+        if output is not None:
+            del output
         gc.collect()
     return score
 
