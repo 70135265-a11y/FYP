@@ -138,7 +138,7 @@ function UploadScansPage() {
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Patient ID <span className="text-red-500">*</span></label>
                   <input type="text" value={patientIdNo} onChange={(e) => setPatientIdNo(e.target.value)}
-                    placeholder="e.g. PAT-001 or CNIC"
+                    placeholder="e.g. PAT-001 "
                     className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition" />
                 </div>
                 <div className="sm:col-span-2">

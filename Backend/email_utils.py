@@ -20,14 +20,15 @@ def send_welcome_email(to_email: str, name: str):
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
             <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                 <div style="background-color: #2563eb; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
-                    <h1 style="color: white; margin: 0;">Welcome to LiverAI!</h1>
+                    <h1 style="color: white; margin: 0;">Welcome to LiverAI Cirrhosis Detection!</h1>
                 </div>
                 <div style="background-color: #f8fafc; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e2e8f0;">
                     <p style="font-size: 16px;">Dear {name},</p>
                     <p style="font-size: 16px;">Thank you for registering with LiverAI. We're excited to have you on board!</p>
-                    <p style="font-size: 16px;">Your account has been successfully created and you can now start using our platform to manage your medical scans and receive AI-powered liver disease analysis.</p>
+                    <p style="font-size: 16px;">Your account has been successfully created and you can now start using our platform to manage your medical scans and receive AI-powered liver Cirrhosis disease analysis.</p>
                     <p style="font-size: 16px;">If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
-                    <p style="font-size: 16px;">Best regards,<br>The LiverAI Team</p>
+                    <p style="font-size: 16px;">Best regards,<br>The LiverAI Cirrhosis Team</p>
+                    <p style="font-size: 16px;">Contact,<br>70135265@student.uol.edu.pk</p>
                 </div>
             </div>
         </body>
