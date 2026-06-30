@@ -76,7 +76,9 @@ def _load_image(image_bytes: bytes) -> Image.Image:
 def predict_score(image_bytes: bytes) -> float:
     img = _load_image(image_bytes)
     img_array = np.array(img, dtype=np.float32) / 255.0
+    del img
     tensor = torch.tensor(img_array).unsqueeze(0).unsqueeze(0).to(device)
+    del img_array
     model = get_model()
     output = None
     try:
@@ -89,7 +91,6 @@ def predict_score(image_bytes: bytes) -> float:
         del tensor
         if output is not None:
             del output
-        gc.collect()
     return score
 
 

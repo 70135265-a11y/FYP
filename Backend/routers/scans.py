@@ -114,6 +114,7 @@ def upload_folder(
             continue
 
         image_bytes = file.file.read()
+        file.file.close()
 
         if representative_path is None or i == mid_index:
             filename = f"{uuid4()}{file_ext}"
