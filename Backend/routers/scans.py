@@ -27,10 +27,8 @@ def upload_scan(
     current_user: User = Depends(get_current_user),
 ):
     file_ext = os.path.splitext(file.filename or "")[1].lower()
-    is_image = file.content_type and file.content_type.startswith("image/")
-    is_dicom = file_ext == ".dcm" or file.content_type in ("application/dicom", "application/octet-stream")
-    if not is_image and not is_dicom:
-        raise HTTPException(status_code=400, detail="Only image or DICOM files are allowed")
+    if file_ext != ".dcm":
+        raise HTTPException(status_code=400, detail="Only DICOM (.dcm) files are allowed")
 
     file_extension = os.path.splitext(file.filename or "")[1]
     filename = f"{uuid4()}{file_extension}"
@@ -108,9 +106,7 @@ def upload_folder(
 
     for i, file in enumerate(files):
         file_ext = os.path.splitext(file.filename or "")[1].lower()
-        is_image = file.content_type and file.content_type.startswith("image/")
-        is_dicom = file_ext == ".dcm" or file.content_type in ("application/dicom", "application/octet-stream")
-        if not is_image and not is_dicom:
+        if file_ext != ".dcm":
             continue
 
         image_bytes = file.file.read()

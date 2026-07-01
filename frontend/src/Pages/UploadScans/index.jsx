@@ -26,9 +26,7 @@ function UploadScansPage() {
   const isDicom = (f) => f.name.toLowerCase().endsWith('.dcm');
 
   const addFiles = (newFiles) => {
-    const valid = Array.from(newFiles).filter(
-      (f) => f.type.startsWith('image/') || isDicom(f)
-    );
+    const valid = Array.from(newFiles).filter(isDicom);
     if (!valid.length) return;
     setFiles((prev) => [...prev, ...valid]);
     setResult(null);
@@ -158,14 +156,14 @@ function UploadScansPage() {
                 className="border-2 border-dashed border-blue-300 rounded-xl p-10 text-center hover:border-blue-400 hover:bg-blue-50 transition"
               >
                 <div className="text-5xl mb-3">🩻</div>
-                <p className="text-blue-600 font-semibold">Select all slices for one patient's liver scan</p>
+                <p className="text-blue-600 font-semibold">Select all DICOM (.dcm) slices for one patient's liver scan</p>
                 <div className="mt-4 flex justify-center gap-3">
                   <button type="button" onClick={() => folderRef.current?.click()}
                     className="rounded-lg bg-indigo-600 text-white text-xs font-semibold px-4 py-2 hover:bg-indigo-700 transition">
                     🗂️ Select Folder
                   </button>
                 </div>
-                <p className="text-gray-400 text-sm mt-3">Select a folder containing DICOM (.dcm), JPG, or PNG slices — all files treated as one scan</p>
+                <p className="text-gray-400 text-sm mt-3">Select a folder containing DICOM (.dcm) slices only — all files treated as one scan</p>
                 <input ref={folderRef} type="file" multiple webkitdirectory="" className="hidden" onChange={handleFileChange} />
               </div>
 
