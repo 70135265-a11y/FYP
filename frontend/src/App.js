@@ -14,7 +14,6 @@ import TermsPage from './Pages/Terms';
 import PrivacyPage from './Pages/Privacy';
 import TermsPublicPage from './Pages/TermsPublic';
 import PrivacyPublicPage from './Pages/PrivacyPublic';
-import ChatWidget from './Components/ChatWidget/ChatWidget';
 
 function ProtectedRoute({ children }) {
   const authStorage = localStorage.getItem('authStorage');
@@ -28,9 +27,6 @@ function ProtectedRoute({ children }) {
 }
 
 function App() {
-  const authStorage = localStorage.getItem('authStorage');
-  const token = authStorage === 'session' ? sessionStorage.getItem('token') : localStorage.getItem('token');
-
   return (
     <Router>
       <Routes>
@@ -50,7 +46,6 @@ function App() {
         <Route path="/dashboard/terms" element={<ProtectedRoute><TermsPage /></ProtectedRoute>} />
         <Route path="/dashboard/privacy" element={<ProtectedRoute><PrivacyPage /></ProtectedRoute>} />
       </Routes>
-      {token && <ChatWidget />}
     </Router>
   );
 }

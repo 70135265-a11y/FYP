@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import Base, engine
 import models
-from routers import auth, scans, patients, reports, chat
+from routers import auth, scans, patients, reports
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +24,6 @@ app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(scans.router, prefix="/api/scans", tags=["Scans"])
 app.include_router(patients.router, prefix="/api/patients", tags=["Patients"])
 app.include_router(reports.router, prefix="/api/reports", tags=["Reports"])
-app.include_router(chat.router, prefix="/api/chat", tags=["Chat"])
 
 @app.get("/")
 def root():

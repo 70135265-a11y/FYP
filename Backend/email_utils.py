@@ -1,19 +1,16 @@
-import requests
+import resend
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
+resend.api_key = os.getenv("RESEND_API_KEY")
 
 def send_welcome_email(to_email: str, name: str):
     """
     Send a welcome email to the user after successful registration using Resend API.
     """
     try:
-        api_key = os.getenv("RESEND_API_KEY")
-        
-        # Resend API endpoint
-        url = "https://api.resend.com/emails"
-        
         # Email body
         html_content = f"""
         <html>
@@ -35,29 +32,17 @@ def send_welcome_email(to_email: str, name: str):
         </html>
         """
         
-        # Email payload - send to your verified email for testing
-        payload = {
+        # Send email using resend library
+        params = {
             "from": "LiverAI <onboarding@resend.dev>",
             "to": ["70135265@student.uol.edu.pk"],
             "subject": f"Welcome to LiverAI! (Registration for: {to_email})",
             "html": html_content
         }
         
-        # Headers
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Send email
-        response = requests.post(url, json=payload, headers=headers)
-        
-        if response.status_code == 200:
-            print(f"Welcome email sent successfully to {to_email}")
-            return True
-        else:
-            print(f"Failed to send email to {to_email}: {response.status_code} - {response.text}")
-            return False
+        resend.Emails.send(params)
+        print(f"Welcome email sent successfully to {to_email}")
+        return True
         
     except Exception as e:
         print(f"Failed to send email to {to_email}: {str(e)}")
@@ -69,13 +54,8 @@ def send_password_reset_email(to_email: str, reset_token: str, name: str = None)
     Send a password reset email to the user using Resend API.
     """
     try:
-        api_key = os.getenv("RESEND_API_KEY")
-        
-        # Resend API endpoint
-        url = "https://api.resend.com/emails"
-        
         # Frontend URL for password reset (update this to your frontend URL)
-        frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+        frontend_url = os.getenv("FRONTEND_URL", "https://fyp-pi-six.vercel.app")
         reset_link = f"{frontend_url}/reset-password?token={reset_token}"
         
         # Email body
@@ -102,29 +82,17 @@ def send_password_reset_email(to_email: str, reset_token: str, name: str = None)
         </html>
         """
         
-        # Email payload - send to your verified email for testing
-        payload = {
+        # Send email using resend library
+        params = {
             "from": "LiverAI <onboarding@resend.dev>",
             "to": ["70135265@student.uol.edu.pk"],
             "subject": "Reset Your LiverAI Password",
             "html": html_content
         }
         
-        # Headers
-        headers = {
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json"
-        }
-        
-        # Send email
-        response = requests.post(url, json=payload, headers=headers)
-        
-        if response.status_code == 200:
-            print(f"Password reset email sent successfully to {to_email}")
-            return True
-        else:
-            print(f"Failed to send email to {to_email}: {response.status_code} - {response.text}")
-            return False
+        resend.Emails.send(params)
+        print(f"Password reset email sent successfully to {to_email}")
+        return True
         
     except Exception as e:
         print(f"Failed to send email to {to_email}: {str(e)}")
