@@ -101,9 +101,9 @@ function LoginPage() {
                 />
                 Remember me
               </label>
-              <button type="button" className="font-semibold text-blue-600 hover:text-blue-800">
+              <Link to="/forgot-password" className="font-semibold text-blue-600 hover:text-blue-800">
                 Forgot password?
-              </button>
+              </Link>
             </div>
 
             <button

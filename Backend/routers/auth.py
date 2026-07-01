@@ -1,16 +1,17 @@
 from datetime import datetime, timedelta
 from jose import JWTError, jwt
 import bcrypt
+import secrets
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from database import get_db
 from models import User
-from schemas import Token, UserCreate, UserLogin, UserResponse, UserUpdate
+from schemas import Token, UserCreate, UserLogin, UserResponse, UserUpdate, ForgotPasswordRequest, ResetPasswordRequest
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from email_utils import send_welcome_email
+from email_utils import send_welcome_email, send_password_reset_email
 
 router = APIRouter()
 security = HTTPBearer()
@@ -143,3 +144,52 @@ def delete_profile(
     db.commit()
     
     return {"message": "Profile deleted successfully"}
+
+
+@router.post("/forgot-password")
+def forgot_password(
+    request: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        # Don't reveal if email exists or not for security
+        return {"message": "If an account with this email exists, a password reset link has been sent."}
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    reset_token_expiration = datetime.utcnow() + timedelta(hours=1)
+    
+    # Save token to user
+    user.reset_token = reset_token
+    user.reset_token_expiration = reset_token_expiration
+    db.commit()
+    
+    # Send reset email
+    send_password_reset_email(user.email, reset_token, user.name)
+    
+    return {"message": "If an account with this email exists, a password reset link has been sent."}
+
+
+@router.post("/reset-password")
+def reset_password(
+    request: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    # Find user by reset token
+    user = db.query(User).filter(User.reset_token == request.token).first()
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check if token is expired
+    if user.reset_token_expiration and user.reset_token_expiration < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    # Update password
+    user.password = hash_password(request.new_password)
+    user.reset_token = None
+    user.reset_token_expiration = None
+    db.commit()
+    
+    return {"message": "Password reset successfully"}

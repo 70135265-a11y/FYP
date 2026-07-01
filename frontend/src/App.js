@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LandingPage from './Pages/LandingPage';
 import LoginPage from './Pages/Login';
 import RegisterPage from './Pages/Register';
+import ForgotPasswordPage from './Pages/ForgotPassword';
+import ResetPasswordPage from './Pages/ResetPassword';
 import DashboardHome from './Pages/Dashboard';
 import ReportsPage from './Pages/Reports';
 import ScansHistoryPage from './Pages/ScansHistory';
@@ -35,6 +37,8 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/terms" element={<TermsPublicPage />} />
         <Route path="/privacy" element={<PrivacyPublicPage />} />
 

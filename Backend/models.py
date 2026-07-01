@@ -14,6 +14,8 @@ class User(Base):
     role = Column(String(50), default="patient", nullable=False)
     phone = Column(String(20), nullable=True)
     address = Column(String(255), nullable=True)
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expiration = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     scans = relationship("Scan", back_populates="user")
